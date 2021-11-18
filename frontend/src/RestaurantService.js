@@ -9,4 +9,8 @@ export default class RestaurantsService{
         const url = `${API_URL}/restaurants/`;
         return axios.get(url).then(response => response.data);
     }
+    createRestaurant(restaurant){
+        const url = `${API_URL}/restaurants/`;
+        return axios.post(url, restaurant).then(response => response.data);
+    }
 }

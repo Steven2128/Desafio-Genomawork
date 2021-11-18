@@ -1,4 +1,5 @@
 import './App.css';
+
 import RestaurantList from './RestaurantList';
 
 function App() {
