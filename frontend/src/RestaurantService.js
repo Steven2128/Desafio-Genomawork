@@ -13,4 +13,16 @@ export default class RestaurantsService{
         const url = `${API_URL}/restaurants/`;
         return axios.post(url, restaurant).then(response => response.data);
     }
+    getRestaurant(pk){
+        const url = `${API_URL}/restaurants/${pk}/`;
+        return axios.get(url).then(response => response.data);
+    }
+    updateRestaurant(restaurant){
+        const url = `${API_URL}/restaurants/${restaurant.id}/`;
+        return axios.put(url, restaurant);
+    }
+    deleteRestaurant(restaurant){
+        const url = `${API_URL}/restaurants/${restaurant.id}/`;
+        return axios.delete(url);
+    }
 }

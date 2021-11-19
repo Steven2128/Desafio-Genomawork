@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrashAlt, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrashAlt, faCheck, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 import RestaurantService from './RestaurantService';
@@ -40,13 +40,23 @@ class RestaurantList extends Component {
         });
     }
 
+    handleDelete(pk){
+        var  self  =  this;
+        restaurantsService.deleteRestaurant({id :  pk}).then(()=>{
+            var  newArr  =  self.state.restaurants.filter(function(obj) {
+                return  obj.pk  !==  pk;
+            });
+            self.setState({restaurants:  newArr});
+            this.componentDidMount();
+        });
+    }
 
     render() {
 
         return (
             <div className="customers--list">
                 <h1>Restaurantes</h1>
-                <button className="btn btn-success float-right" onClick={() => this.modalInsertar()}>Agregar Restaurante</button>
+                <button className="btn btn-success float-right mb-2" onClick={() => this.modalInsertar()}>Agregar Restaurante <FontAwesomeIcon className="ml-1" icon={faPlus} /></button>
                 <table className="table">
                     <thead key="thead">
                         <tr>
@@ -71,8 +81,8 @@ class RestaurantList extends Component {
                                 {value.visited ? <FontAwesomeIcon className="text-success" icon={faCheck} /> : <FontAwesomeIcon className="text-danger" icon={faTimes} />}
                                 </td>
                                 <td>
-                                    <button className="btn btn-warning mr-2"><FontAwesomeIcon icon={faEdit} /></button>
-                                    <button className="btn btn-danger"><FontAwesomeIcon icon={faTrashAlt} /></button>
+                                    <button className="btn btn-warning mr-2" ><FontAwesomeIcon icon={faEdit} /></button>
+                                    <button className="btn btn-danger" onClick={(e)=>  this.handleDelete(value.id) }><FontAwesomeIcon icon={faTrashAlt} /></button>
                                 </td>
                             </tr>)}
                     </tbody>
@@ -93,8 +103,8 @@ class RestaurantList extends Component {
                             <input className="form-control" type="text" name="kind_food" id="kind_food" ref="kind_food" />
                             <label htmlFor="calificacion">Calificación</label>
                             <input className="form-control" type="number" name="rating" id="rating" max="5" min="0" ref="rating" />
-                            <label htmlFor="visitado">Visitado</label>
-                            <input className="form-control" type="checkbox" name="visited" id="visited" ref="visited" />
+                            <label htmlFor="visitado" check>Visitado</label>
+                            <input className="ml-1" type="checkbox" name="visited" id="visited" ref="visited" />
                         </div>
                     </ModalBody>
 
