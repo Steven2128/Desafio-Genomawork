@@ -22,6 +22,7 @@ class RestaurantList extends Component {
                 rating: 0,
                 visited: false
               },
+            direction: '',
         };
     }
     modalInsertar = () => {
@@ -95,6 +96,16 @@ class RestaurantList extends Component {
         });
     }
 
+    sortByColumn(column){
+        if (this.state.direction == '' || this.state.direction == 'descending'){
+            this.setState({restaurant: this.state.restaurants.sort((a, b) => (a[column] > b[column] ? 1 : a[column] < b[column] ? -1 : 0))});
+            this.setState({direction: 'ascending'});
+        }else if(this.state.direction == 'ascending'){
+            this.setState({restaurant: this.state.restaurants.sort((b, a) => (a[column] > b[column] ? 1 : a[column] < b[column] ? -1 : 0))});
+            this.setState({direction: 'descending'});
+        }
+    }
+
     render() {
         const activeItem = this.state.activeItem;
         let button;
@@ -110,13 +121,13 @@ class RestaurantList extends Component {
                 <button className="btn btn-success float-right mb-2" onClick={() => this.modalInsertar()}>Agregar Restaurante <FontAwesomeIcon className="ml-1" icon={faPlus} /></button>
                 <table className="table">
                     <thead key="thead">
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre</th>
-                            <th>Ubicación</th>
-                            <th>Tipo de comida</th>
-                            <th>Calificación</th>
-                            <th>Visitado</th>
+                        <tr >
+                            <th >#</th>
+                            <th onClick={() => this.sortByColumn('name')}><span style={{cursor: 'pointer'}}>Nombre</span></th>
+                            <th onClick={() => this.sortByColumn('location')}><span style={{cursor: 'pointer'}}>Ubicación</span></th>
+                            <th onClick={() => this.sortByColumn('kind_food')}><span style={{cursor: 'pointer'}}>Tipo de comida</span></th>
+                            <th onClick={() => this.sortByColumn('rating')}><span style={{cursor: 'pointer'}}>Calificación</span></th>
+                            <th onClick={() => this.sortByColumn('visited')}><span style={{cursor: 'pointer'}}>Visitado</span></th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
