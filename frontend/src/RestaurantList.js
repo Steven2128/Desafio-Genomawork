@@ -14,10 +14,19 @@ class RestaurantList extends Component {
         this.state = {
             restaurants: [],
             modalInsertar: false,
+            activeItem: {
+                id: null,
+                name: "",
+                location: '',
+                kind_food: '',
+                rating: 0,
+                visited: false
+              },
         };
     }
     modalInsertar = () => {
         this.setState({ modalInsertar: !this.state.modalInsertar });
+        this.handleReset();
     }
 
     componentDidMount() {
@@ -40,19 +49,61 @@ class RestaurantList extends Component {
         });
     }
 
-    handleDelete(pk){
-        var  self  =  this;
-        restaurantsService.deleteRestaurant({id :  pk}).then(()=>{
-            var  newArr  =  self.state.restaurants.filter(function(obj) {
-                return  obj.pk  !==  pk;
+    handleDelete(pk) {
+        var self = this;
+        restaurantsService.deleteRestaurant({ id: pk }).then(() => {
+            var newArr = self.state.restaurants.filter(function (obj) {
+                return obj.pk !== pk;
             });
-            self.setState({restaurants:  newArr});
+            self.setState({ restaurants: newArr });
+            this.componentDidMount();
+        });
+    }
+
+    handleChange = (e) => {
+        let { name, value } = e.target;
+
+        if (e.target.type === "checkbox") {
+            value = e.target.checked;
+        }
+        const activeItem = { ...this.state.activeItem, [name]: value };
+        this.setState({ activeItem });
+    }
+
+    handleSelect(item){
+        this.setState({activeItem: item, modalInsertar: !this.state.modalInsertar});
+
+    }
+
+    handleReset(){
+        this.setState({
+            activeItem:{
+                id: null,
+                name: "",
+                location: '',
+                kind_food: '',
+                rating: 0,
+                visited: false
+            }
+        });
+    }
+
+    handleUpdate(){
+        restaurantsService.updateRestaurant(this.state.activeItem).then(result => {
+            this.modalInsertar();
             this.componentDidMount();
         });
     }
 
     render() {
+        const activeItem = this.state.activeItem;
+        let button;
+        if(activeItem.id == null){
+            button = <button className="btn btn-success" onClick={() => this.handleCreate()}>Agregar</button>
+        }else{
+            button = <button className="btn btn-success" onClick={() => this.handleUpdate()}>Actualizar</button>
 
+        }
         return (
             <div className="customers--list">
                 <h1>Restaurantes</h1>
@@ -78,17 +129,17 @@ class RestaurantList extends Component {
                                 <td>{value.kind_food}</td>
                                 <td>{value.rating}</td>
                                 <td>
-                                {value.visited ? <FontAwesomeIcon className="text-success" icon={faCheck} /> : <FontAwesomeIcon className="text-danger" icon={faTimes} />}
+                                    {value.visited ? <FontAwesomeIcon className="text-success" icon={faCheck} /> : <FontAwesomeIcon className="text-danger" icon={faTimes} />}
                                 </td>
                                 <td>
-                                    <button className="btn btn-warning mr-2" ><FontAwesomeIcon icon={faEdit} /></button>
-                                    <button className="btn btn-danger" onClick={(e)=>  this.handleDelete(value.id) }><FontAwesomeIcon icon={faTrashAlt} /></button>
+                                    <button className="btn btn-warning mr-2" onClick={() => this.handleSelect(value)}><FontAwesomeIcon icon={faEdit} /></button>
+                                    <button className="btn btn-danger" onClick={(e) => this.handleDelete(value.id)}><FontAwesomeIcon icon={faTrashAlt} /></button>
                                 </td>
                             </tr>)}
                     </tbody>
                 </table>
-                <Modal isOpen={this.state.modalInsertar}>
-                    <ModalHeader style={{ display: 'block' }}>
+                <Modal isOpen={this.state.modalInsertar} activeItem={this.state.activeItem}>
+                    <ModalHeader style={{ display: 'block' }} >
                         Agregar Restaurante nuevo
                         <button className="btn btn-close float-right" onClick={() => this.modalInsertar()}>X</button>
                     </ModalHeader>
@@ -96,20 +147,20 @@ class RestaurantList extends Component {
                     <ModalBody>
                         <div className="form-group">
                             <label htmlFor="nombre">Nombre</label>
-                            <input className="form-control" type="text" name="name" id="name" ref="name" />
+                            <input className="form-control" type="text" name="name" id="name" ref="name" placeholder="Ingrese el nombre del restaurante" onChange={this.handleChange} value={activeItem.name}/>
                             <label htmlFor="ubicacion">Ubicación</label>
-                            <input className="form-control" type="text" name="location" id="location" ref="location" />
+                            <input className="form-control" type="text" name="location" id="location" ref="location" placeholder="Ingrese la ubicación del restaurante"onChange={this.handleChange} value={activeItem.location}/>
                             <label htmlFor="Tipo de comida">Tipo de comida</label>
-                            <input className="form-control" type="text" name="kind_food" id="kind_food" ref="kind_food" />
+                            <input className="form-control" type="text" name="kind_food" id="kind_food" ref="kind_food" placeholder="Ingrese el tipo de comida" onChange={this.handleChange} value={activeItem.kind_food}/>
                             <label htmlFor="calificacion">Calificación</label>
-                            <input className="form-control" type="number" name="rating" id="rating" max="5" min="0" ref="rating" />
+                            <input className="form-control" type="number" name="rating" id="rating" max="5" min="0" ref="rating" placeholder="Ingrese una calificación del 0 al 5" onChange={this.handleChange} value={activeItem.rating}/>
                             <label htmlFor="visitado" check>Visitado</label>
-                            <input className="ml-1" type="checkbox" name="visited" id="visited" ref="visited" />
+                            <input className="ml-1" type="checkbox" name="visited" id="visited" ref="visited" placeholder="Enter Todo Title" onChange={this.handleChange} checked={activeItem.visited}/>
                         </div>
                     </ModalBody>
 
                     <ModalFooter>
-                        <button className="btn btn-success" onClick={() => this.handleCreate()}>Agregar</button>
+                        {button}
                         <button className="btn btn-danger" onClick={() => this.modalInsertar()}>Cancelar</button>
                     </ModalFooter>
                 </Modal>
